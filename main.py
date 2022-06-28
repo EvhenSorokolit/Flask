@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, flash, session, redirect, abort
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'fdsfsdfsdfsdf'
 menu = [{"name": "Установка", "url": "install-flask"},
