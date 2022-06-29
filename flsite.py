@@ -15,7 +15,7 @@ app.config.update(dict(DATABASE=os.path.join(app.root_path, 'flsite.db')))
 def connect_db():
     conn = sqlite3.connect(app.config['DATABASE'])
     conn.row_factory = sqlite3.Row
-    print('ok')
+
     return conn
 
 
@@ -41,11 +41,11 @@ def index():
     dbase = FDataBase(db)
     return render_template('index.html', menu=dbase.getMenu(),posts= dbase.getPostsAnonce())
 
-@app.route("/post/<int:id_post>")
-def showPost(id_post):
+@app.route("/post/<alias>")
+def showPost(alias):
     db = get_db()
     dbase = FDataBase(db)
-    title,post = dbase.getPost(id_post)
+    title,post = dbase.getPost(alias)
     if not title:
         abort(404)
     return render_template('post.html',menu=dbase.getMenu(),title=title, post=post)
@@ -56,7 +56,7 @@ def addPost():
     dbase = FDataBase(db)
     if request.method == "POST":
         if len(request.form['name']) > 4 and len(request.form['post']) > 10:
-            res = dbase.addPost(request.form['name'], request.form['post'])
+            res = dbase.addPost(request.form['name'], request.form['post'], request.form['url'])
             if not res:
                 flash('Ошибка добалвения статьи', category='error')
             else:
