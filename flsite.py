@@ -11,6 +11,12 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, 'flsite.db')))
 
+dbase = None
+@app.before_request
+def before_request():
+    global dbase
+    db = get_db()
+    dbase = FDataBase(db)
 
 def connect_db():
     conn = sqlite3.connect(app.config['DATABASE'])
@@ -37,23 +43,20 @@ def get_db():
 @app.route("/")
 @app.route("/index")
 def index():
-    db = get_db()
-    dbase = FDataBase(db)
+
     return render_template('index.html', menu=dbase.getMenu(),posts= dbase.getPostsAnonce())
 
 @app.route("/post/<alias>")
 def showPost(alias):
-    db = get_db()
-    dbase = FDataBase(db)
+
     title,post = dbase.getPost(alias)
     if not title:
         abort(404)
-    return render_template('post.html',menu=dbase.getMenu(),title=title, post=post)
+    return render_template('post.html', menu=dbase.getMenu(),title=title, post=post)
 
 @app.route("/add_post", methods=["POST", "GET"])
 def addPost():
-    db = get_db()
-    dbase = FDataBase(db)
+
     if request.method == "POST":
         if len(request.form['name']) > 4 and len(request.form['post']) > 10:
             res = dbase.addPost(request.form['name'], request.form['post'], request.form['url'])
